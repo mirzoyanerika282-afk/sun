@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>South of the Sun</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #f5f0eb;
+    --red: #c0180c;
+    --red-dark: #7a0e08;
+    --red-glow: rgba(192, 24, 12, 0.35);
+    --grey: #1a1a1a;
+    --grey-mid: #2d2d2d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Crimson Text', serif;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  }
+
+  .nav-logo img {
+    height: 100px;
+    filter: invert(0);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--red);
+    transition: width 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--red); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 0 60px 80px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('IMG_1144.JPG');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.35) saturate(0.5);
+    transform: scale(1.05);
+    animation: slowzoom 20s ease-in-out infinite alternate;
+  }
+
+  @keyframes slowzoom {
+    from { transform: scale(1.05); }
+    to   { transform: scale(1.12); }
+  }
+
+  .hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,1) 0%,
+      rgba(0,0,0,0.4) 40%,
+      rgba(192,24,12,0.08) 70%,
+      transparent 100%
+    );
+  }
+
+  .hero-line {
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--red), transparent);
+    opacity: 0.4;
+    animation: pulseline 4s ease-in-out infinite;
+  }
+
+  @keyframes pulseline {
+    0%, 100% { opacity: 0.2; }
+    50%       { opacity: 0.6; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 8px;
+    color: var(--red);
+    margin-bottom: 16px;
+    animation: fadein 1.2s ease forwards;
+    opacity: 0;
+    animation-delay: 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(52px, 9vw, 130px);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    animation: fadein 1.2s ease forwards;
+    opacity: 0;
+    animation-delay: 0.6s;
+  }
+
+  .hero-title span {
+    display: block;
+    color: var(--red);
+  }
+
+  .hero-sub {
+    margin-top: 24px;
+    font-size: 18px;
+    font-style: italic;
+    color: rgba(245,240,235,0.6);
+    max-width: 400px;
+    animation: fadein 1.2s ease forwards;
+    opacity: 0;
+    animation-delay: 0.9s;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 20px;
+    margin-top: 40px;
+    animation: fadein 1.2s ease forwards;
+    opacity: 0;
+    animation-delay: 1.2s;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 14px 40px;
+    background: var(--red);
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 4px;
+    border: 1px solid var(--red);
+    transition: all 0.3s;
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--red);
+    box-shadow: 0 0 30px var(--red-glow);
+  }
+
+  .btn-outline {
+    display: inline-block;
+    padding: 14px 40px;
+    background: transparent;
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 4px;
+    border: 1px solid rgba(245,240,235,0.3);
+    transition: all 0.3s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--white);
+    box-shadow: 0 0 20px rgba(245,240,235,0.1);
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-indicator {
+    position: absolute;
+    right: 60px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+    animation: fadein 1.5s ease forwards;
+    opacity: 0;
+    animation-delay: 1.8s;
+  }
+
+  .scroll-indicator span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: rgba(245,240,235,0.4);
+    writing-mode: vertical-rl;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollpulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollpulse {
+    0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    50%  { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+  }
+
+  /* SECTION BASE */
+  section {
+    padding: 120px 60px;
+    position: relative;
+  }
+
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--red);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 40px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--grey-mid), transparent);
+    margin: 0;
+  }
+
+  .red-divider {
+    width: 80px;
+    height: 2px;
+    background: var(--red);
+    margin: 0 0 40px 0;
+  }
+
+  /* ABOUT SECTION */
+  .about {
+    background: var(--grey);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .about-images {
+    position: relative;
+    height: 600px;
+  }
+
+  .about-img-main {
+    position: absolute;
+    top: 0; left: 0;
+    width: 75%;
+    height: 80%;
+    object-fit: cover;
+    object-position: top;
+    filter: grayscale(100%) contrast(1.1);
+  }
+
+  .about-img-accent {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 55%;
+    height: 55%;
+    object-fit: cover;
+    object-position: center;
+    filter: grayscale(100%) contrast(1.1);
+    border: 3px solid var(--black);
+  }
+
+  .about-img-main::after,
+  .about-img-accent::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .about-img-accent {
+    outline: 2px solid var(--red);
+    outline-offset: 6px;
+  }
+
+  .about-text p {
+    font-size: 19px;
+    line-height: 1.8;
+    color: rgba(245,240,235,0.75);
+    margin-bottom: 24px;
+  }
+
+  .about-text p:first-of-type {
+    font-size: 22px;
+    color: var(--white);
+    font-style: italic;
+  }
+
+  /* SHOWS SECTION */
+  .shows {
+    background: var(--black);
+  }
+
+  .shows-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--grey-mid);
+  }
+
+  .show-item {
+    display: grid;
+    grid-template-columns: 120px 1fr auto auto;
+    align-items: center;
+    gap: 40px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--grey-mid);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .show-item:hover {
+    padding-left: 20px;
+    background: linear-gradient(to right, rgba(192,24,12,0.08), transparent);
+  }
+
+  .show-date {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--red);
+  }
+
+  .show-date span {
+    display: block;
+    font-size: 13px;
+    color: rgba(245,240,235,0.4);
+    letter-spacing: 1px;
+  }
+
+  .show-info h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .show-info p {
+    font-size: 15px;
+    color: rgba(245,240,235,0.5);
+    letter-spacing: 1px;
+  }
+
+  .show-tag {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    border: 1px solid rgba(245,240,235,0.2);
+    color: rgba(245,240,235,0.5);
+  }
+
+  .show-ticket {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 10px 28px;
+    background: var(--red);
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid var(--red);
+    transition: all 0.3s;
+  }
+
+  .show-ticket:hover {
+    background: transparent;
+    color: var(--red);
+  }
+
+  /* GALLERY */
+  .gallery {
+    background: var(--grey);
+    padding: 120px 0;
+  }
+
+  .gallery-header {
+    padding: 0 60px;
+    margin-bottom: 60px;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 400px;
+    gap: 4px;
+  }
+
+  .gallery-item {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.15);
+    transition: transform 0.6s ease, filter 0.4s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
+    filter: grayscale(60%) contrast(1.2);
+  }
+
+  .gallery-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--red);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .gallery-item:hover::after { opacity: 0.25; }
+
+  /* RED STAGE SECTION */
+  .stage-section {
+    position: relative;
+    height: 60vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stage-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('IMG_20251025_211154691.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    filter: brightness(0.5) saturate(1.5);
+  }
+
+  .stage-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(192,24,12,0.3) 50%, rgba(0,0,0,0.8) 100%);
+  }
+
+  .stage-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .stage-content h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(40px, 7vw, 90px);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 0.9;
+  }
+
+  .stage-content h2 em {
+    font-style: normal;
+    color: var(--red);
+    display: block;
+  }
+
+  /* MUSIC SECTION */
+  .music {
+    background: var(--black);
+    padding: 120px 60px;
+  }
+
+  .music-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .music-card {
+    background: var(--grey);
+    padding: 40px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .music-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .music-card:hover::before { transform: scaleX(1); }
+
+  .music-card:hover {
+    background: var(--grey-mid);
+  }
+
+  .music-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--red);
+    margin-bottom: 16px;
+  }
+
+  .music-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .music-card p {
+    font-size: 16px;
+    color: rgba(245,240,235,0.55);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .music-listen {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: gap 0.3s;
+  }
+
+  .music-listen:hover { gap: 16px; }
+
+  .music-listen::after {
+    content: '→';
+  }
+
+  /* CONTACT */
+  .contact {
+    background: var(--grey);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .contact-info {
+    padding: 120px 60px;
+    border-right: 1px solid var(--grey-mid);
+  }
+
+  .contact-form-area {
+    padding: 120px 60px;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    color: var(--white);
+    font-size: 17px;
+    transition: color 0.3s;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--grey-mid);
+  }
+
+  .contact-link:hover { color: var(--red); }
+
+  .contact-link-icon {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--grey-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .contact-link:hover .contact-link-icon {
+    border-color: var(--red);
+    background: var(--red-glow);
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-group label {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: rgba(245,240,235,0.4);
+    margin-bottom: 10px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--grey-mid);
+    color: var(--white);
+    padding: 14px 18px;
+    font-family: 'Crimson Text', serif;
+    font-size: 17px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .form-group textarea { height: 140px; resize: none; }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--red);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--grey-mid);
+  }
+
+  .footer-logo img {
+    height: 80px;
+  }
+
+  .footer-copy {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(245,240,235,0.25);
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-social a {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(245,240,235,0.3);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .footer-social a:hover { color: var(--red); }
+
+  /* LOGO BADGE */
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .logo-badge img {
+    height: 60px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    .hero { padding: 0 24px 60px; }
+    .about { grid-template-columns: 1fr; }
+    .about-images { height: 350px; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .music-grid { grid-template-columns: 1fr; }
+    .contact { grid-template-columns: 1fr; }
+    .contact-info { border-right: none; border-bottom: 1px solid var(--grey-mid); padding: 80px 24px; }
+    .contact-form-area { padding: 80px 24px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; padding: 40px 24px; }
+    .show-item { grid-template-columns: 80px 1fr; gap: 16px; }
+    .show-tag, .show-ticket { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="SouthOfTheSunLogo-05.png" alt="South of the Sun">
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#shows">Shows</a></li>
+    <li><a href="#music">Music</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-gradient"></div>
+  <div class="hero-line"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Est. Yerevan · Armenia</p>
+    <h1 class="hero-title">
+      South of<br><span>the Sun</span>
+    </h1>
+    <p class="hero-sub">Where darkness meets melody — heavy, honest, relentless.</p>
+    <div class="hero-cta">
+      <a href="#shows" class="btn-primary">Upcoming Shows</a>
+      <a href="#music" class="btn-outline">Listen Now</a>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-images">
+    <img class="about-img-main" src="IMG_7255.JPG" alt="Band photo" />
+    <img class="about-img-accent" src="IMG_7365.JPG" alt="Band fun" />
+  </div>
+
+  <div class="about-text">
+    <p class="section-label">Our Story</p>
+    <h2 class="section-title">Born from<br>the underground</h2>
+    <div class="red-divider"></div>
+    <p>South of the Sun is a rock band from Yerevan, Armenia — seven musicians forged from the same relentless drive to create something raw, powerful, and real.</p>
+    <p>We draw from the heaviness of metal, the soul of rock, and the atmosphere of post-everything. Our sound is a collision — urgent and expansive, familiar and strange.</p>
+    <p>We play every show like it's the last one. Because that's the only way worth playing.</p>
+    <a href="#contact" class="btn-outline" style="margin-top:16px; display:inline-block;">Get in Touch</a>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SHOWS -->
+<section class="shows" id="shows">
+  <p class="section-label">On the Road</p>
+  <h2 class="section-title">Upcoming Shows</h2>
+
+  <div class="shows-grid">
+    <div class="show-item">
+      <div class="show-date">APR 12<span>2026</span></div>
+      <div class="show-info">
+        <h3>Yerevan Rock Night</h3>
+        <p>Calumet, Yerevan · Armenia</p>
+      </div>
+      <span class="show-tag">Hometown</span>
+      <a href="#" class="show-ticket">Tickets</a>
+    </div>
+    <div class="show-item">
+      <div class="show-date">MAY 03<span>2026</span></div>
+      <div class="show-info">
+        <h3>Tbilisi Underground Fest</h3>
+        <p>Bassiani, Tbilisi · Georgia</p>
+      </div>
+      <span class="show-tag">Festival</span>
+      <a href="#" class="show-ticket">Tickets</a>
+    </div>
+    <div class="show-item">
+      <div class="show-date">MAY 22<span>2026</span></div>
+      <div class="show-info">
+        <h3>Rock the Ararat</h3>
+        <p>Republic Square, Yerevan · Armenia</p>
+      </div>
+      <span class="show-tag">Open Air</span>
+      <a href="#" class="show-ticket">Tickets</a>
+    </div>
+    <div class="show-item">
+      <div class="show-date">JUN 14<span>2026</span></div>
+      <div class="show-info">
+        <h3>Metal Carnival Berlin</h3>
+        <p>SO36, Berlin · Germany</p>
+      </div>
+      <span class="show-tag">Europe</span>
+      <a href="#" class="show-ticket">Tickets</a>
+    </div>
+  </div>
+</section>
+
+<!-- STAGE QUOTE -->
+<div class="stage-section">
+  <div class="stage-bg"></div>
+  <div class="stage-overlay"></div>
+  <div class="stage-content">
+    <h2>Feel the<br><em>heat</em></h2>
+  </div>
+</div>
+
+<!-- MUSIC -->
+<section class="music" id="music">
+  <p class="section-label">Discography</p>
+  <h2 class="section-title">Our Music</h2>
+
+  <div class="music-grid">
+    <div class="music-card">
+      <p class="music-year">2024</p>
+      <h3>Single: "Descent"</h3>
+      <p>Our debut single — a slow-burning heavy rock track that introduced South of the Sun to the underground scene.</p>
+      <a href="#" class="music-listen">Listen on Spotify</a>
+    </div>
+    <div class="music-card">
+      <p class="music-year">2025</p>
+      <h3>EP: "Sunblind"</h3>
+      <p>Four tracks of raw energy and melodic weight. Recorded live in Yerevan. No filters, no polish. Just the band.</p>
+      <a href="#" class="music-listen">Stream Now</a>
+    </div>
+    <div class="music-card">
+      <p class="music-year">2026</p>
+      <h3>Coming Soon</h3>
+      <p>Our first full-length album is in the works. Sign up below to be the first to hear it when it drops.</p>
+      <a href="#contact" class="music-listen">Stay Updated</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="gallery-header">
+    <p class="section-label">Photos</p>
+    <h2 class="section-title">Gallery</h2>
+  </div>
+
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="IMG_7255.JPG" alt="Band photo 1">
+    </div>
+    <div class="gallery-item">
+      <img src="IMG_7365.JPG" alt="Band photo 2">
+    </div>
+    <div class="gallery-item">
+      <img src="IMG_20251025_211154691.jpg" alt="Live show" style="object-position: center 20%;">
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-info">
+    <p class="section-label">Get in Touch</p>
+    <h2 class="section-title">Contact</h2>
+    <p style="font-size:18px; color:rgba(245,240,235,0.65); margin-bottom: 16px; line-height:1.7;">Booking, press, or just want to say hello? We read everything.</p>
+
+    <div class="contact-links">
+      <a href="mailto:info@southofthesun.am" class="contact-link">
+        <div class="contact-link-icon">✉</div>
+        info@southofthesun.am
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">IG</div>
+        @southofthesunband
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">FB</div>
+        South of the Sun
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">YT</div>
+        South of the Sun · YouTube
+      </a>
+    </div>
+  </div>
+
+  <div class="contact-form-area">
+    <p class="section-label" style="margin-top:0;">Send a Message</p>
+    <h2 class="section-title" style="font-size: clamp(28px,3vw,44px);">Let's Talk</h2>
+
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" placeholder="Name Surname">
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label>Subject</label>
+      <input type="text" placeholder="Booking / Press / Other">
+    </div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea placeholder="Tell us what's on your mind..."></textarea>
+    </div>
+    <button class="btn-primary" style="border:none; cursor:pointer; width:100%;" onclick="this.textContent='Sent ✓'; this.style.background='#1a1a1a'; this.style.borderColor='#1a1a1a';">Send Message</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="SouthOfTheSunLogo-05.png" alt="South of the Sun">
+  </div>
+  <p class="footer-copy">© 2026 South of the Sun · All rights reserved</p>
+  <div class="footer-social">
+    <a href="#">Instagram</a>
+    <a href="#">Facebook</a>
+    <a href="#">Spotify</a>
+    <a href="#">YouTube</a>
+  </div>
+</footer>
+
+</body>
+</html>
