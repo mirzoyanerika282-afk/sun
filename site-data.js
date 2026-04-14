@@ -4,6 +4,7 @@
     tracks: 'sots_tracks',
     passcode: 'sots_admin_passcode'
   };
+  const CONTENT_API = '/api/content';
 
   const DEFAULT_SHOWS = [
     { id: 'show-1', date: '2026-04-12', title: 'Yerevan Rock Night', venue: 'Calumet', city: 'Yerevan', country: 'Armenia', tag: 'Hometown', ticketUrl: '' },
@@ -87,6 +88,55 @@
     return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
   }
 
+  async function refreshContent() {
+    try {
+      const response = await fetch(CONTENT_API, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error('Failed to load remote content.');
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data.shows)) {
+        saveShows(data.shows);
+      }
+      if (Array.isArray(data.tracks)) {
+        saveTracks(data.tracks);
+      }
+      return data;
+    } catch (error) {
+      return {
+        shows: getShows(),
+        tracks: getTracks()
+      };
+    }
+  }
+
+  async function persistContent(nextContent) {
+    const payload = {
+      shows: Array.isArray(nextContent?.shows) ? nextContent.shows : getShows(),
+      tracks: Array.isArray(nextContent?.tracks) ? nextContent.tracks : getTracks()
+    };
+
+    const response = await fetch(CONTENT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save remote content.');
+    }
+
+    const saved = await response.json();
+    if (Array.isArray(saved.shows)) {
+      saveShows(saved.shows);
+    }
+    if (Array.isArray(saved.tracks)) {
+      saveTracks(saved.tracks);
+    }
+    return saved;
+  }
+
   ensureDefaults();
 
   window.SOTS_STORAGE = {
@@ -97,6 +147,8 @@
     getPasscode,
     savePasscode,
     formatShowDate,
-    uid
+    uid,
+    refreshContent,
+    persistContent
   };
 })();

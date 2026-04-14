@@ -245,8 +245,8 @@
 </footer>
 <script src="site-data.js"></script>
 <script>
-  const shows = window.SOTS_STORAGE.getShows();
-  const tracks = window.SOTS_STORAGE.getTracks();
+  let shows = [];
+  let tracks = [];
   const showsList = document.getElementById('shows-list');
   const tracksList = document.getElementById('tracks-list');
   const audio = document.getElementById('site-audio');
@@ -354,8 +354,15 @@
     if (currentTrack.audioUrl) { audio.play().catch(() => {}); return; }
     updatePlayer(currentTrack);
   });
-  renderShows();
-  renderTracks();
+  async function initPage() {
+    await window.SOTS_STORAGE.refreshContent();
+    shows = window.SOTS_STORAGE.getShows();
+    tracks = window.SOTS_STORAGE.getTracks();
+    renderShows();
+    renderTracks();
+  }
+
+  initPage();
 </script>
 </body>
 </html>

@@ -110,7 +110,7 @@
 
 <script src="site-data.js"></script>
 <script>
-  const tracks = window.SOTS_STORAGE.getTracks();
+  let tracks = [];
   const vinylGrid = document.getElementById('vinyl-grid');
   const statusBar = document.getElementById('status-bar');
   const audioPlayer = document.getElementById('audio-player');
@@ -287,7 +287,13 @@
   audioPlayer.addEventListener('pause', stopVisualPlayback);
   audioPlayer.addEventListener('ended', stopVisualPlayback);
 
-  renderLibrary();
+  async function initMusicPage() {
+    const remote = await window.SOTS_STORAGE.refreshContent();
+    tracks = Array.isArray(remote.tracks) ? remote.tracks : window.SOTS_STORAGE.getTracks();
+    renderLibrary();
+  }
+
+  initMusicPage();
 </script>
 </body>
 </html>
