@@ -1,0 +1,379 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal | South of the Sun</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#050505; --panel:#121212; --panel-2:#1b1b1b; --text:#f5f0eb; --muted:rgba(245,240,235,0.66); --red:#931007; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:radial-gradient(circle at top, rgba(147,16,7,0.16), transparent 35%), var(--bg); color:var(--text); font-family:'Crimson Text',serif; min-height:100vh; }
+  .shell { max-width:1200px; margin:0 auto; padding:40px 24px 80px; }
+  .topbar { display:flex; justify-content:space-between; gap:20px; align-items:center; margin-bottom:28px; }
+  .eyebrow { font-family:'Bebas Neue',sans-serif; letter-spacing:5px; color:var(--red); font-size:14px; }
+  h1, h2 { font-family:'Cinzel',serif; }
+  h1 { font-size:clamp(34px,6vw,62px); }
+  h2 { font-size:30px; margin-bottom:18px; }
+  .note { color:var(--muted); line-height:1.7; font-size:18px; }
+  .gate, .panel, .item { background:linear-gradient(180deg, rgba(24,24,24,0.96), rgba(10,10,10,1)); border:1px solid rgba(245,240,235,0.08); }
+  .gate { max-width:520px; margin:100px auto 0; padding:32px; }
+  .hidden { display:none !important; }
+  .dashboard { display:grid; gap:24px; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .panel { padding:28px; }
+  label { display:block; margin-bottom:16px; font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:13px; color:rgba(245,240,235,0.72); }
+  input, textarea { width:100%; margin-top:8px; background:transparent; border:none; border-bottom:1px solid rgba(245,240,235,0.18); color:var(--text); padding:12px 0; font-family:'Crimson Text',serif; font-size:18px; }
+  textarea { min-height:110px; resize:vertical; }
+  .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+  button, a.button { display:inline-flex; align-items:center; justify-content:center; padding:14px 24px; border:1px solid rgba(245,240,235,0.2); background:transparent; color:var(--text); text-decoration:none; cursor:pointer; font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:14px; }
+  button.primary { background:var(--red); border-color:var(--red); }
+  .list { display:grid; gap:16px; margin-top:20px; }
+  .item { padding:18px 20px; }
+  .item strong { display:block; font-family:'Bebas Neue',sans-serif; letter-spacing:3px; font-size:18px; color:var(--red); margin-bottom:8px; }
+  .item p { color:var(--muted); line-height:1.7; }
+  .item-actions { margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+  .status { margin-top:14px; color:#ffb9b4; min-height:24px; }
+  .success { color:#9ce5ac; }
+  .inline { display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
+  @media (max-width: 900px) { .row, .inline, .topbar { grid-template-columns:1fr; display:grid; } .topbar { justify-content:start; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div id="login-gate" class="gate">
+    <p class="eyebrow">Admin Only</p>
+    <h1>Admin Portal</h1>
+    <p class="note" style="margin:16px 0 20px;">Enter the admin passcode to manage show dates, ticket links, songs, and streaming links.</p>
+    <label>Passcode<input id="passcode-input" type="password" placeholder="Enter admin passcode"></label>
+    <div class="actions">
+      <button id="login-button" class="primary" type="button">Enter</button>
+      <a class="button" href="index.html">Back to Site</a>
+    </div>
+    <div id="login-status" class="status"></div>
+  </div>
+
+  <div id="dashboard" class="dashboard hidden">
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">Admin Dashboard</p>
+        <h1>Manage Site Content</h1>
+      </div>
+      <div class="actions">
+        <a class="button" href="index.html">View Site</a>
+        <button id="logout-button" type="button">Logout</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <section class="panel">
+        <h2>Add Show</h2>
+        <p class="note">New concert dates added here will appear automatically in the Upcoming Shows section on the homepage.</p>
+        <label>Date<input id="show-date" type="date"></label>
+        <label>Title<input id="show-title" type="text" placeholder="Yerevan Rock Night"></label>
+        <div class="inline">
+          <label>Venue<input id="show-venue" type="text" placeholder="Calumet"></label>
+          <label>Tag<input id="show-tag" type="text" placeholder="Festival / Live / Open Air"></label>
+        </div>
+        <div class="inline">
+          <label>City<input id="show-city" type="text" placeholder="Yerevan"></label>
+          <label>Country<input id="show-country" type="text" placeholder="Armenia"></label>
+        </div>
+        <label>Ticket Link<input id="show-ticket" type="url" placeholder="https://..."></label>
+        <div class="actions"><button id="add-show" class="primary" type="button">Save Show</button></div>
+        <div id="show-status" class="status"></div>
+      </section>
+
+      <section class="panel">
+        <h2 id="track-form-title">Add Music</h2>
+        <p class="note">Add songs, upload an album cover, upload an mp3 preview, and attach Spotify or YouTube links. The homepage player updates from this list.</p>
+        <div class="inline">
+          <label>Year<input id="track-year" type="text" placeholder="2026"></label>
+          <label>Release Type<input id="track-type" type="text" placeholder="Single / EP / Album"></label>
+        </div>
+        <label>Title<input id="track-title" type="text" placeholder="Track title"></label>
+        <label>Description<textarea id="track-description" placeholder="Short description of the release"></textarea></label>
+        <label>Cover Image URL<input id="track-cover" type="text" placeholder="IMG_7255.JPG or https://..."></label>
+        <label>Or Upload Cover Image<input id="track-cover-file" type="file" accept="image/*"></label>
+        <label>Audio Preview URL<input id="track-audio" type="url" placeholder="Direct mp3/ogg link for on-site playback"></label>
+        <label>Or Upload MP3<input id="track-audio-file" type="file" accept=".mp3,audio/mpeg,audio/*"></label>
+        <div class="inline">
+          <label>Spotify Link<input id="track-spotify" type="url" placeholder="https://open.spotify.com/..."></label>
+          <label>YouTube Link<input id="track-youtube" type="url" placeholder="https://youtube.com/..."></label>
+        </div>
+        <div class="actions">
+          <button id="add-track" class="primary" type="button">Save Track</button>
+          <button id="cancel-track-edit" type="button" class="hidden">Cancel Edit</button>
+        </div>
+        <div id="track-status" class="status"></div>
+      </section>
+    </div>
+
+    <div class="row">
+      <section class="panel">
+        <h2>Upcoming Shows List</h2>
+        <div id="shows-admin-list" class="list"></div>
+      </section>
+      <section class="panel">
+        <h2>Music List</h2>
+        <div id="tracks-admin-list" class="list"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2>Admin Access</h2>
+      <p class="note">This page is protected with a client-side passcode because the site is static. You can change the passcode below.</p>
+      <label>New Passcode<input id="new-passcode" type="text" placeholder="Create a new passcode"></label>
+      <div class="actions"><button id="save-passcode" type="button">Update Passcode</button></div>
+      <div id="passcode-status" class="status"></div>
+    </section>
+  </div>
+</div>
+<script src="site-data.js"></script>
+<script>
+  const AUTH_KEY = 'sots_admin_session';
+  const loginGate = document.getElementById('login-gate');
+  const dashboard = document.getElementById('dashboard');
+  const loginStatus = document.getElementById('login-status');
+  const showStatus = document.getElementById('show-status');
+  const trackStatus = document.getElementById('track-status');
+  const passcodeStatus = document.getElementById('passcode-status');
+  const showsList = document.getElementById('shows-admin-list');
+  const tracksList = document.getElementById('tracks-admin-list');
+  const trackFormTitle = document.getElementById('track-form-title');
+  const addTrackButton = document.getElementById('add-track');
+  const cancelTrackEditButton = document.getElementById('cancel-track-edit');
+  let editingTrackId = null;
+
+  function setStatus(target, message, success) {
+    target.textContent = message;
+    target.className = success ? 'status success' : 'status';
+  }
+
+  function isLoggedIn() {
+    return sessionStorage.getItem(AUTH_KEY) === 'true';
+  }
+
+  function showDashboard() {
+    loginGate.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    renderShows();
+    renderTracks();
+  }
+
+  function renderShows() {
+    const shows = window.SOTS_STORAGE.getShows();
+    if (!shows.length) {
+      showsList.innerHTML = '<div class="item"><p>No shows added yet.</p></div>';
+      return;
+    }
+
+    showsList.innerHTML = shows.map((show) => {
+      const date = window.SOTS_STORAGE.formatShowDate(show.date);
+      const where = [show.venue, show.city, show.country].filter(Boolean).join(', ');
+      return '<div class="item"><strong>' + date.monthDay + ' ' + date.year + ' - ' + show.title + '</strong><p>' + where + '</p><p>' + (show.ticketUrl || 'No ticket link yet') + '</p><div class="item-actions"><button type="button" data-delete-show="' + show.id + '">Delete</button></div></div>';
+    }).join('');
+
+    showsList.querySelectorAll('[data-delete-show]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = window.SOTS_STORAGE.getShows().filter((show) => show.id !== button.dataset.deleteShow);
+        window.SOTS_STORAGE.saveShows(next);
+        renderShows();
+      });
+    });
+  }
+
+  function renderTracks() {
+    const tracks = window.SOTS_STORAGE.getTracks();
+    if (!tracks.length) {
+      tracksList.innerHTML = '<div class="item"><p>No tracks added yet.</p></div>';
+      return;
+    }
+
+    tracksList.innerHTML = tracks.map((track) => {
+      return '<div class="item"><strong>' + track.year + ' - ' + track.title + '</strong><p>' + (track.releaseType || 'Release') + '</p><p>' + (track.audioUrl ? 'On-site playback ready' : 'No uploaded audio preview') + '</p><p>' + (track.spotifyUrl || track.youtubeUrl || 'No streaming links yet') + '</p><div class="item-actions"><button type="button" data-edit-track="' + track.id + '">Edit</button><button type="button" data-delete-track="' + track.id + '">Delete</button></div></div>';
+    }).join('');
+
+    tracksList.querySelectorAll('[data-edit-track]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const track = window.SOTS_STORAGE.getTracks().find((item) => item.id === button.dataset.editTrack);
+        if (!track) {
+          return;
+        }
+
+        editingTrackId = track.id;
+        trackFormTitle.textContent = 'Edit Music';
+        addTrackButton.textContent = 'Update Track';
+        cancelTrackEditButton.classList.remove('hidden');
+        document.getElementById('track-year').value = track.year || '';
+        document.getElementById('track-type').value = track.releaseType || '';
+        document.getElementById('track-title').value = track.title || '';
+        document.getElementById('track-description').value = track.description || '';
+        document.getElementById('track-cover').value = track.coverUrl || '';
+        document.getElementById('track-audio').value = track.audioUrl && !track.audioUrl.startsWith('data:') ? track.audioUrl : '';
+        document.getElementById('track-cover-file').value = '';
+        document.getElementById('track-audio-file').value = '';
+        document.getElementById('track-spotify').value = track.spotifyUrl || '';
+        document.getElementById('track-youtube').value = track.youtubeUrl || '';
+        setStatus(trackStatus, 'Editing "' + track.title + '". Upload a new file only if you want to replace the current one.', true);
+      });
+    });
+
+    tracksList.querySelectorAll('[data-delete-track]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = window.SOTS_STORAGE.getTracks().filter((track) => track.id !== button.dataset.deleteTrack);
+        window.SOTS_STORAGE.saveTracks(next);
+        if (editingTrackId === button.dataset.deleteTrack) {
+          resetTrackForm();
+        }
+        renderTracks();
+      });
+    });
+  }
+
+  function resetTrackForm() {
+    editingTrackId = null;
+    trackFormTitle.textContent = 'Add Music';
+    addTrackButton.textContent = 'Save Track';
+    cancelTrackEditButton.classList.add('hidden');
+    document.getElementById('track-year').value = '';
+    document.getElementById('track-type').value = '';
+    document.getElementById('track-title').value = '';
+    document.getElementById('track-description').value = '';
+    document.getElementById('track-cover').value = '';
+    document.getElementById('track-cover-file').value = '';
+    document.getElementById('track-audio').value = '';
+    document.getElementById('track-audio-file').value = '';
+    document.getElementById('track-spotify').value = '';
+    document.getElementById('track-youtube').value = '';
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve('');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Failed to read file.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('login-button').addEventListener('click', () => {
+    const value = document.getElementById('passcode-input').value.trim();
+    if (value === window.SOTS_STORAGE.getPasscode()) {
+      sessionStorage.setItem(AUTH_KEY, 'true');
+      showDashboard();
+      setStatus(loginStatus, '', true);
+    } else {
+      setStatus(loginStatus, 'Wrong passcode.', false);
+    }
+  });
+
+  document.getElementById('logout-button').addEventListener('click', () => {
+    sessionStorage.removeItem(AUTH_KEY);
+    dashboard.classList.add('hidden');
+    loginGate.classList.remove('hidden');
+  });
+
+  document.getElementById('add-show').addEventListener('click', () => {
+    const show = {
+      id: window.SOTS_STORAGE.uid('show'),
+      date: document.getElementById('show-date').value,
+      title: document.getElementById('show-title').value.trim(),
+      venue: document.getElementById('show-venue').value.trim(),
+      tag: document.getElementById('show-tag').value.trim(),
+      city: document.getElementById('show-city').value.trim(),
+      country: document.getElementById('show-country').value.trim(),
+      ticketUrl: document.getElementById('show-ticket').value.trim()
+    };
+
+    if (!show.date || !show.title) {
+      setStatus(showStatus, 'Date and title are required.', false);
+      return;
+    }
+
+    const shows = window.SOTS_STORAGE.getShows();
+    shows.push(show);
+    window.SOTS_STORAGE.saveShows(shows);
+    renderShows();
+    document.getElementById('show-date').value = '';
+    document.getElementById('show-title').value = '';
+    document.getElementById('show-venue').value = '';
+    document.getElementById('show-tag').value = '';
+    document.getElementById('show-city').value = '';
+    document.getElementById('show-country').value = '';
+    document.getElementById('show-ticket').value = '';
+    setStatus(showStatus, 'Show saved.', true);
+  });
+
+  document.getElementById('add-track').addEventListener('click', async () => {
+    const coverFile = document.getElementById('track-cover-file').files[0];
+    const audioFile = document.getElementById('track-audio-file').files[0];
+    const tracks = window.SOTS_STORAGE.getTracks();
+    const existingTrack = editingTrackId ? tracks.find((track) => track.id === editingTrackId) : null;
+
+    try {
+      const uploadedCover = await readFileAsDataUrl(coverFile);
+      const uploadedAudio = await readFileAsDataUrl(audioFile);
+      const track = {
+        id: existingTrack ? existingTrack.id : window.SOTS_STORAGE.uid('track'),
+        year: document.getElementById('track-year').value.trim(),
+        releaseType: document.getElementById('track-type').value.trim(),
+        title: document.getElementById('track-title').value.trim(),
+        description: document.getElementById('track-description').value.trim(),
+        coverUrl: uploadedCover || document.getElementById('track-cover').value.trim() || (existingTrack ? existingTrack.coverUrl : 'IMG_7255.JPG'),
+        audioUrl: uploadedAudio || document.getElementById('track-audio').value.trim() || (existingTrack ? existingTrack.audioUrl : ''),
+        spotifyUrl: document.getElementById('track-spotify').value.trim(),
+        youtubeUrl: document.getElementById('track-youtube').value.trim()
+      };
+
+      if (!track.title) {
+        setStatus(trackStatus, 'Track title is required.', false);
+        return;
+      }
+
+      if (editingTrackId) {
+        const next = tracks.map((item) => item.id === editingTrackId ? track : item);
+        window.SOTS_STORAGE.saveTracks(next);
+        setStatus(trackStatus, 'Track updated.', true);
+      } else {
+        tracks.push(track);
+        window.SOTS_STORAGE.saveTracks(tracks);
+        setStatus(trackStatus, 'Track saved.', true);
+      }
+
+      resetTrackForm();
+      renderTracks();
+    } catch (error) {
+      setStatus(trackStatus, 'File upload failed. Try a smaller image or mp3 file.', false);
+    }
+  });
+
+  cancelTrackEditButton.addEventListener('click', () => {
+    resetTrackForm();
+    setStatus(trackStatus, 'Edit cancelled.', true);
+  });
+
+  document.getElementById('save-passcode').addEventListener('click', () => {
+    const nextPasscode = document.getElementById('new-passcode').value.trim();
+    if (!nextPasscode) {
+      setStatus(passcodeStatus, 'Passcode cannot be empty.', false);
+      return;
+    }
+
+    window.SOTS_STORAGE.savePasscode(nextPasscode);
+    document.getElementById('new-passcode').value = '';
+    setStatus(passcodeStatus, 'Passcode updated.', true);
+  });
+
+  if (isLoggedIn()) {
+    showDashboard();
+  }
+</script>
+</body>
+</html>
+
