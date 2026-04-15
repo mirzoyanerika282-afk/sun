@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const STORAGE_KEYS = {
     shows: 'sots_shows',
     tracks: 'sots_tracks',
@@ -92,7 +92,14 @@
     try {
       const response = await fetch(CONTENT_API, { cache: 'no-store' });
       if (!response.ok) {
-        throw new Error('Failed to load remote content.');
+        let details = '';
+        try {
+          const body = await response.json();
+          details = body?.details || body?.error || '';
+        } catch (e) {
+          // ignore
+        }
+        throw new Error('Failed to load remote content. ' + (details ? ('(' + details + ')') : ('HTTP ' + response.status)));
       }
 
       const data = await response.json();
@@ -124,7 +131,14 @@
     });
 
     if (!response.ok) {
-      throw new Error('Failed to save remote content.');
+      let details = '';
+      try {
+        const body = await response.json();
+        details = body?.details || body?.error || '';
+      } catch (e) {
+        // ignore
+      }
+      throw new Error('Failed to save remote content. ' + (details ? ('(' + details + ')') : ('HTTP ' + response.status)));
     }
 
     const saved = await response.json();
