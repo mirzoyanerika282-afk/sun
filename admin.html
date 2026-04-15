@@ -144,6 +144,7 @@
   const addTrackButton = document.getElementById('add-track');
   const cancelTrackEditButton = document.getElementById('cancel-track-edit');
   let editingTrackId = null;
+  let isSaving = false;
 
   function setStatus(target, message, success) {
     target.textContent = message;
@@ -154,12 +155,50 @@
     return sessionStorage.getItem(AUTH_KEY) === 'true';
   }
 
+  function setBusyState(nextState) {
+    isSaving = nextState;
+    document.querySelectorAll('button').forEach((button) => {
+      if (button.id !== 'logout-button') {
+        button.disabled = nextState;
+        button.style.opacity = nextState ? '0.65' : '1';
+      }
+    });
+  }
+
+  async function persistAndRefresh(content, successTarget, successMessage) {
+    try {
+      setBusyState(true);
+      await window.SOTS_STORAGE.persistContent(content);
+      await window.SOTS_STORAGE.refreshContent();
+      renderShows();
+      renderTracks();
+      if (successTarget && successMessage) {
+        setStatus(successTarget, successMessage, true);
+      }
+      return true;
+    } catch (error) {
+      if (successTarget) {
+        setStatus(successTarget, 'Save failed. Check Vercel Blob setup or network and try again.', false);
+      }
+      return false;
+    } finally {
+      setBusyState(false);
+    }
+  }
+
   async function showDashboard() {
     loginGate.classList.add('hidden');
     dashboard.classList.remove('hidden');
-    await window.SOTS_STORAGE.refreshContent();
-    renderShows();
-    renderTracks();
+    setStatus(showStatus, '', true);
+    setStatus(trackStatus, '', true);
+    try {
+      await window.SOTS_STORAGE.refreshContent();
+      renderShows();
+      renderTracks();
+    } catch (error) {
+      renderShows();
+      renderTracks();
+    }
   }
 
   function renderShows() {
@@ -177,9 +216,11 @@
 
     showsList.querySelectorAll('[data-delete-show]').forEach((button) => {
       button.addEventListener('click', async () => {
+        if (isSaving) {
+          return;
+        }
         const next = window.SOTS_STORAGE.getShows().filter((show) => show.id !== button.dataset.deleteShow);
-        await window.SOTS_STORAGE.persistContent({ shows: next, tracks: window.SOTS_STORAGE.getTracks() });
-        renderShows();
+        await persistAndRefresh({ shows: next, tracks: window.SOTS_STORAGE.getTracks() }, showStatus, 'Show deleted.');
       });
     });
   }
@@ -222,12 +263,17 @@
 
     tracksList.querySelectorAll('[data-delete-track]').forEach((button) => {
       button.addEventListener('click', async () => {
+        if (isSaving) {
+          return;
+        }
         const next = window.SOTS_STORAGE.getTracks().filter((track) => track.id !== button.dataset.deleteTrack);
-        await window.SOTS_STORAGE.persistContent({ shows: window.SOTS_STORAGE.getShows(), tracks: next });
+        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks: next }, trackStatus, 'Track deleted.');
         if (editingTrackId === button.dataset.deleteTrack) {
           resetTrackForm();
         }
-        renderTracks();
+        if (!saved && editingTrackId === button.dataset.deleteTrack) {
+          cancelTrackEditButton.classList.remove('hidden');
+        }
       });
     });
   }
@@ -281,6 +327,9 @@
   });
 
   document.getElementById('add-show').addEventListener('click', async () => {
+    if (isSaving) {
+      return;
+    }
     const show = {
       id: window.SOTS_STORAGE.uid('show'),
       date: document.getElementById('show-date').value,
@@ -299,8 +348,10 @@
 
     const shows = window.SOTS_STORAGE.getShows();
     shows.push(show);
-    await window.SOTS_STORAGE.persistContent({ shows, tracks: window.SOTS_STORAGE.getTracks() });
-    renderShows();
+    const saved = await persistAndRefresh({ shows, tracks: window.SOTS_STORAGE.getTracks() }, showStatus, 'Show saved.');
+    if (!saved) {
+      return;
+    }
     document.getElementById('show-date').value = '';
     document.getElementById('show-title').value = '';
     document.getElementById('show-venue').value = '';
@@ -308,10 +359,12 @@
     document.getElementById('show-city').value = '';
     document.getElementById('show-country').value = '';
     document.getElementById('show-ticket').value = '';
-    setStatus(showStatus, 'Show saved.', true);
   });
 
   document.getElementById('add-track').addEventListener('click', async () => {
+    if (isSaving) {
+      return;
+    }
     const coverFile = document.getElementById('track-cover-file').files[0];
     const audioFile = document.getElementById('track-audio-file').files[0];
     const tracks = window.SOTS_STORAGE.getTracks();
@@ -339,16 +392,19 @@
 
       if (editingTrackId) {
         const next = tracks.map((item) => item.id === editingTrackId ? track : item);
-        await window.SOTS_STORAGE.persistContent({ shows: window.SOTS_STORAGE.getShows(), tracks: next });
-        setStatus(trackStatus, 'Track updated.', true);
+        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks: next }, trackStatus, 'Track updated.');
+        if (!saved) {
+          return;
+        }
       } else {
         tracks.push(track);
-        await window.SOTS_STORAGE.persistContent({ shows: window.SOTS_STORAGE.getShows(), tracks });
-        setStatus(trackStatus, 'Track saved.', true);
+        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks }, trackStatus, 'Track saved.');
+        if (!saved) {
+          return;
+        }
       }
 
       resetTrackForm();
-      renderTracks();
     } catch (error) {
       setStatus(trackStatus, 'File upload failed. Try a smaller image or mp3 file.', false);
     }
