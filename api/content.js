@@ -1,4 +1,4 @@
-import { list, put } from '@vercel/blob';
+const { list, put } = require('@vercel/blob');
 
 const DEFAULT_CONTENT = {
   shows: [
@@ -32,7 +32,7 @@ async function readContent() {
   };
 }
 
-export default async function handler(request, response) {
+module.exports = async function handler(request, response) {
   try {
     if (request.method === 'GET') {
       const content = await readContent();

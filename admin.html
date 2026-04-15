@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -168,17 +168,30 @@
   async function persistAndRefresh(content, successTarget, successMessage) {
     try {
       setBusyState(true);
-      await window.SOTS_STORAGE.persistContent(content);
-      await window.SOTS_STORAGE.refreshContent();
+      const nextShows = Array.isArray(content?.shows) ? content.shows : window.SOTS_STORAGE.getShows();
+      const nextTracks = Array.isArray(content?.tracks) ? content.tracks : window.SOTS_STORAGE.getTracks();
+
+      // Update local state immediately so admin actions feel instant.
+      window.SOTS_STORAGE.saveShows(nextShows);
+      window.SOTS_STORAGE.saveTracks(nextTracks);
       renderShows();
       renderTracks();
+
+      // Then sync to remote blob storage so all visitors see changes.
+      await window.SOTS_STORAGE.persistContent({ shows: nextShows, tracks: nextTracks });
+      await window.SOTS_STORAGE.refreshContent();
+
       if (successTarget && successMessage) {
         setStatus(successTarget, successMessage, true);
       }
       return true;
     } catch (error) {
       if (successTarget) {
-        setStatus(successTarget, 'Save failed. Check Vercel Blob setup or network and try again.', false);
+        setStatus(
+          successTarget,
+          'Saved locally, but remote sync failed. Check Vercel Blob setup/network and try again so visitors can see the update.',
+          false
+        );
       }
       return false;
     } finally {
