@@ -187,9 +187,12 @@
       return true;
     } catch (error) {
       if (successTarget) {
+        const details = error && typeof error === 'object' && 'message' in error ? String(error.message || '') : '';
         setStatus(
           successTarget,
-          'Saved locally, but remote sync failed. Check Vercel Blob setup/network and try again so visitors can see the update.',
+          'Saved locally, but remote sync failed. ' +
+            (details ? ('Details: ' + details + '. ') : '') +
+            'Check Vercel Blob setup/network and try again so visitors can see the update.',
           false
         );
       }
