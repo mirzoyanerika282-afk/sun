@@ -249,6 +249,14 @@
   const detailImage = document.getElementById('detail-image');
   let currentTrack = null;
 
+  function isMp4Url(url) {
+    if (!url) return false;
+    var u = String(url).toLowerCase();
+    return u.indexOf('data:video/mp4') !== -1 ||
+      u.indexOf('video/mp4') !== -1 ||
+      /(\.mp4)(\?|#|$)/i.test(u);
+  }
+
   function getYouTubeEmbedUrl(url) {
     if (!url) { return ''; }
     try {
@@ -332,6 +340,33 @@
     }
 
     if (track.audioUrl) {
+      if (isMp4Url(track.audioUrl)) {
+        // MP4 is played via <video> so audio-in-video works too.
+        audioPlayer.pause();
+        audioPlayer.removeAttribute('src');
+        audioPlayer.load();
+        audioPlayer.style.display = 'none';
+
+        videoShell.innerHTML = '<video id="record-video" preload="none" playsinline style="width:100%; height:100%; background:#000;"></video>';
+        videoShell.style.display = 'block';
+
+        var v = document.getElementById('record-video');
+        v.src = track.audioUrl;
+        v.currentTime = 0;
+        v.onended = stopVisualPlayback;
+        v.onpause = stopVisualPlayback;
+
+        v.play().then(() => {
+          nowPlayingLabel.textContent = 'Now Playing';
+          setActiveTrack(track.id, true);
+        }).catch(() => {
+          nowPlayingLabel.textContent = 'Ready To Play';
+        });
+        return;
+      }
+
+      // Normal audio preview.
+      audioPlayer.style.display = 'block';
       audioPlayer.src = track.audioUrl;
       audioPlayer.currentTime = 0;
       audioPlayer.load(); // Make sure the new audio source is ready.
