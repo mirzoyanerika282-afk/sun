@@ -588,9 +588,9 @@
   });
 
   async function initPage() {
-    await window.SOTS_STORAGE.refreshContent();
-    shows  = window.SOTS_STORAGE.getShows();
-    tracks = window.SOTS_STORAGE.getTracks();
+    const remote = await window.SOTS_STORAGE.refreshContent();
+    shows  = Array.isArray(remote?.shows) ? remote.shows : window.SOTS_STORAGE.getShows();
+    tracks = Array.isArray(remote?.tracks) ? remote.tracks : window.SOTS_STORAGE.getTracks();
     renderShows();
     renderTracks();
   }

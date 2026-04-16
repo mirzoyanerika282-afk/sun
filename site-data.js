@@ -88,8 +88,9 @@
     return prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
   }
 
-  async function refreshContent() {
+  async function refreshContent(options) {
     try {
+      const skipLocal = Boolean(options && options.skipLocal);
       const response = await fetch(CONTENT_API, { cache: 'no-store' });
       if (!response.ok) {
         let details = '';
@@ -103,11 +104,13 @@
       }
 
       const data = await response.json();
-      if (Array.isArray(data.shows)) {
-        saveShows(data.shows);
-      }
-      if (Array.isArray(data.tracks)) {
-        saveTracks(data.tracks);
+      if (!skipLocal) {
+        if (Array.isArray(data.shows)) {
+          try { saveShows(data.shows); } catch (e) {}
+        }
+        if (Array.isArray(data.tracks)) {
+          try { saveTracks(data.tracks); } catch (e) {}
+        }
       }
       return data;
     } catch (error) {
@@ -118,11 +121,12 @@
     }
   }
 
-  async function persistContent(nextContent) {
+  async function persistContent(nextContent, options) {
     const payload = {
       shows: Array.isArray(nextContent?.shows) ? nextContent.shows : getShows(),
       tracks: Array.isArray(nextContent?.tracks) ? nextContent.tracks : getTracks()
     };
+    const skipLocal = Boolean(options && options.skipLocal);
 
     const response = await fetch(CONTENT_API, {
       method: 'POST',
@@ -142,11 +146,13 @@
     }
 
     const saved = await response.json();
-    if (Array.isArray(saved.shows)) {
-      saveShows(saved.shows);
-    }
-    if (Array.isArray(saved.tracks)) {
-      saveTracks(saved.tracks);
+    if (!skipLocal) {
+      if (Array.isArray(saved.shows)) {
+        try { saveShows(saved.shows); } catch (e) {}
+      }
+      if (Array.isArray(saved.tracks)) {
+        try { saveTracks(saved.tracks); } catch (e) {}
+      }
     }
     return saved;
   }

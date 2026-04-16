@@ -145,6 +145,8 @@
   const cancelTrackEditButton = document.getElementById('cancel-track-edit');
   let editingTrackId = null;
   let isSaving = false;
+  let currentShows = [];
+  let currentTracks = [];
 
   function setStatus(target, message, success) {
     target.textContent = message;
@@ -168,18 +170,20 @@
   async function persistAndRefresh(content, successTarget, successMessage) {
     try {
       setBusyState(true);
-      const nextShows = Array.isArray(content?.shows) ? content.shows : window.SOTS_STORAGE.getShows();
-      const nextTracks = Array.isArray(content?.tracks) ? content.tracks : window.SOTS_STORAGE.getTracks();
+      const nextShows = Array.isArray(content?.shows) ? content.shows : currentShows;
+      const nextTracks = Array.isArray(content?.tracks) ? content.tracks : currentTracks;
 
-      // Update local state immediately so admin actions feel instant.
-      window.SOTS_STORAGE.saveShows(nextShows);
-      window.SOTS_STORAGE.saveTracks(nextTracks);
-      renderShows();
-      renderTracks();
+      // Optimistic UI update: don't touch localStorage (prevents quota errors).
+      currentShows = nextShows;
+      currentTracks = nextTracks;
+      renderShows(currentShows);
+      renderTracks(currentTracks);
 
-      // Then sync to remote blob storage so all visitors see changes.
-      await window.SOTS_STORAGE.persistContent({ shows: nextShows, tracks: nextTracks });
-      await window.SOTS_STORAGE.refreshContent();
+      // Sync to remote blob storage so all visitors see changes.
+      await window.SOTS_STORAGE.persistContent(
+        { shows: currentShows, tracks: currentTracks },
+        { skipLocal: true }
+      );
 
       if (successTarget && successMessage) {
         setStatus(successTarget, successMessage, true);
@@ -190,7 +194,7 @@
         const details = error && typeof error === 'object' && 'message' in error ? String(error.message || '') : '';
         setStatus(
           successTarget,
-          'Saved locally, but remote sync failed. ' +
+          'Remote sync failed. ' +
             (details ? ('Details: ' + details + '. ') : '') +
             'Check Vercel Blob setup/network and try again so visitors can see the update.',
           false
@@ -208,17 +212,19 @@
     setStatus(showStatus, '', true);
     setStatus(trackStatus, '', true);
     try {
-      await window.SOTS_STORAGE.refreshContent();
-      renderShows();
-      renderTracks();
+      const remote = await window.SOTS_STORAGE.refreshContent({ skipLocal: true });
+      currentShows = Array.isArray(remote?.shows) ? remote.shows : window.SOTS_STORAGE.getShows();
+      currentTracks = Array.isArray(remote?.tracks) ? remote.tracks : window.SOTS_STORAGE.getTracks();
     } catch (error) {
-      renderShows();
-      renderTracks();
+      currentShows = window.SOTS_STORAGE.getShows();
+      currentTracks = window.SOTS_STORAGE.getTracks();
     }
+    renderShows(currentShows);
+    renderTracks(currentTracks);
   }
 
-  function renderShows() {
-    const shows = window.SOTS_STORAGE.getShows();
+  function renderShows(shows) {
+    shows = Array.isArray(shows) ? shows : currentShows;
     if (!shows.length) {
       showsList.innerHTML = '<div class="item"><p>No shows added yet.</p></div>';
       return;
@@ -235,14 +241,14 @@
         if (isSaving) {
           return;
         }
-        const next = window.SOTS_STORAGE.getShows().filter((show) => show.id !== button.dataset.deleteShow);
-        await persistAndRefresh({ shows: next, tracks: window.SOTS_STORAGE.getTracks() }, showStatus, 'Show deleted.');
+        const nextShows = currentShows.filter((show) => show.id !== button.dataset.deleteShow);
+        await persistAndRefresh({ shows: nextShows, tracks: currentTracks }, showStatus, 'Show deleted.');
       });
     });
   }
 
-  function renderTracks() {
-    const tracks = window.SOTS_STORAGE.getTracks();
+  function renderTracks(tracks) {
+    tracks = Array.isArray(tracks) ? tracks : currentTracks;
     if (!tracks.length) {
       tracksList.innerHTML = '<div class="item"><p>No tracks added yet.</p></div>';
       return;
@@ -254,7 +260,7 @@
 
     tracksList.querySelectorAll('[data-edit-track]').forEach((button) => {
       button.addEventListener('click', () => {
-        const track = window.SOTS_STORAGE.getTracks().find((item) => item.id === button.dataset.editTrack);
+        const track = currentTracks.find((item) => item.id === button.dataset.editTrack);
         if (!track) {
           return;
         }
@@ -282,8 +288,8 @@
         if (isSaving) {
           return;
         }
-        const next = window.SOTS_STORAGE.getTracks().filter((track) => track.id !== button.dataset.deleteTrack);
-        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks: next }, trackStatus, 'Track deleted.');
+        const nextTracks = currentTracks.filter((track) => track.id !== button.dataset.deleteTrack);
+        const saved = await persistAndRefresh({ shows: currentShows, tracks: nextTracks }, trackStatus, 'Track deleted.');
         if (editingTrackId === button.dataset.deleteTrack) {
           resetTrackForm();
         }
@@ -325,6 +331,37 @@
     });
   }
 
+  function isDataUrl(value) {
+    return typeof value === 'string' && value.startsWith('data:');
+  }
+
+  async function uploadAsset(file, folder, prefix) {
+    const dataUrl = await readFileAsDataUrl(file);
+    const res = await fetch('/api/upload-asset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dataUrl,
+        fileName: file.name,
+        contentType: file.type,
+        folder,
+        prefix
+      })
+    });
+
+    if (!res.ok) {
+      let details = '';
+      try {
+        const body = await res.json();
+        details = body?.details || body?.error || '';
+      } catch (e) {}
+      throw new Error('Asset upload failed. ' + (details ? ('(' + details + ')') : ('HTTP ' + res.status)));
+    }
+
+    const body = await res.json();
+    return body.url;
+  }
+
   document.getElementById('login-button').addEventListener('click', () => {
     const value = document.getElementById('passcode-input').value.trim();
     if (value === window.SOTS_STORAGE.getPasscode()) {
@@ -362,9 +399,9 @@
       return;
     }
 
-    const shows = window.SOTS_STORAGE.getShows();
-    shows.push(show);
-    const saved = await persistAndRefresh({ shows, tracks: window.SOTS_STORAGE.getTracks() }, showStatus, 'Show saved.');
+    const nextShows = currentShows.slice();
+    nextShows.push(show);
+    const saved = await persistAndRefresh({ shows: nextShows, tracks: currentTracks }, showStatus, 'Show saved.');
     if (!saved) {
       return;
     }
@@ -383,20 +420,41 @@
     }
     const coverFile = document.getElementById('track-cover-file').files[0];
     const audioFile = document.getElementById('track-audio-file').files[0];
-    const tracks = window.SOTS_STORAGE.getTracks();
+    const tracks = currentTracks;
     const existingTrack = editingTrackId ? tracks.find((track) => track.id === editingTrackId) : null;
+    const nextTrackId = existingTrack ? existingTrack.id : window.SOTS_STORAGE.uid('track');
 
     try {
-      const uploadedCover = await readFileAsDataUrl(coverFile);
-      const uploadedAudio = await readFileAsDataUrl(audioFile);
+      let uploadedCoverUrl = '';
+      let uploadedAudioUrl = '';
+      if (coverFile) {
+        uploadedCoverUrl = await uploadAsset(coverFile, 'covers', nextTrackId);
+      }
+      if (audioFile) {
+        uploadedAudioUrl = await uploadAsset(audioFile, 'audio', nextTrackId);
+      }
+
+      const coverFromInput = document.getElementById('track-cover').value.trim();
+      const audioFromInput = document.getElementById('track-audio').value.trim();
+
       const track = {
-        id: existingTrack ? existingTrack.id : window.SOTS_STORAGE.uid('track'),
+        id: nextTrackId,
         year: document.getElementById('track-year').value.trim(),
         releaseType: document.getElementById('track-type').value.trim(),
         title: document.getElementById('track-title').value.trim(),
         description: document.getElementById('track-description').value.trim(),
-        coverUrl: uploadedCover || document.getElementById('track-cover').value.trim() || (existingTrack ? existingTrack.coverUrl : 'IMG_7255.JPG'),
-        audioUrl: uploadedAudio || document.getElementById('track-audio').value.trim() || (existingTrack ? existingTrack.audioUrl : ''),
+        coverUrl:
+          uploadedCoverUrl ||
+          coverFromInput ||
+          (existingTrack
+            ? (isDataUrl(existingTrack.coverUrl) ? 'IMG_7255.JPG' : existingTrack.coverUrl)
+            : 'IMG_7255.JPG'),
+        audioUrl:
+          uploadedAudioUrl ||
+          audioFromInput ||
+          (existingTrack
+            ? (isDataUrl(existingTrack.audioUrl) ? '' : existingTrack.audioUrl)
+            : ''),
         spotifyUrl: document.getElementById('track-spotify').value.trim(),
         youtubeUrl: document.getElementById('track-youtube').value.trim()
       };
@@ -408,13 +466,14 @@
 
       if (editingTrackId) {
         const next = tracks.map((item) => item.id === editingTrackId ? track : item);
-        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks: next }, trackStatus, 'Track updated.');
+        const saved = await persistAndRefresh({ shows: currentShows, tracks: next }, trackStatus, 'Track updated.');
         if (!saved) {
           return;
         }
       } else {
-        tracks.push(track);
-        const saved = await persistAndRefresh({ shows: window.SOTS_STORAGE.getShows(), tracks }, trackStatus, 'Track saved.');
+        const next = tracks.slice();
+        next.push(track);
+        const saved = await persistAndRefresh({ shows: currentShows, tracks: next }, trackStatus, 'Track saved.');
         if (!saved) {
           return;
         }
