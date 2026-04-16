@@ -485,6 +485,12 @@
     } catch (e) { return ''; }
   }
 
+  function openExternalPlayback(url) {
+    if (!url) return false;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   function updatePlayer(track) {
     currentTrack = track;
     playerCover.src = track.coverUrl || 'IMG_7255.JPG';
@@ -534,9 +540,13 @@
         playCurrentButton.style.opacity = '1';
         playerStatus.textContent = 'This track is playing from YouTube inside the site.';
       } else if (embedUrl && location.protocol === 'file:') {
-        playCurrentButton.disabled = true;
-        playCurrentButton.style.opacity = '0.5';
-        playerStatus.textContent = 'YouTube inline playback is blocked when the site is opened as a local file. Open the site through hosting or localhost to play YouTube here.';
+        playCurrentButton.disabled = false;
+        playCurrentButton.style.opacity = '1';
+        playerStatus.textContent = 'Inline playback is blocked in local file mode. Press play to open the track on YouTube.';
+      } else if (track.youtubeUrl) {
+        playCurrentButton.disabled = false;
+        playCurrentButton.style.opacity = '1';
+        playerStatus.textContent = 'This YouTube link cannot be embedded here. Press play to open it on YouTube.';
       } else {
         playCurrentButton.disabled = true;
         playCurrentButton.style.opacity = '0.5';
@@ -583,6 +593,13 @@
         audio.play().catch(function(){});
       }
       return;
+    }
+    if (currentTrack.youtubeUrl) {
+      var embedUrl = getYouTubeEmbedUrl(currentTrack.youtubeUrl);
+      if (!embedUrl || location.protocol === 'file:') {
+        openExternalPlayback(currentTrack.youtubeUrl);
+        return;
+      }
     }
     updatePlayer(currentTrack);
   });

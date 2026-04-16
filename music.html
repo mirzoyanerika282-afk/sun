@@ -311,6 +311,12 @@
     if (currentTrack) { setActiveTrack(currentTrack.id, false); }
   }
 
+  function openExternalPlayback(url) {
+    if (!url) { return false; }
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   function playTrack(track) {
     currentTrack = track;
     statusBar.classList.remove('is-hidden');
@@ -386,8 +392,15 @@
       nowPlayingLabel.textContent = 'Now Playing';
       setActiveTrack(track.id, true);
     } else if (embedUrl && location.protocol === 'file:') {
-      nowPlayingLabel.textContent = 'Playback Notice';
-      nowPlayingText.textContent = 'YouTube inline playback is blocked in local file mode. Open through localhost or hosting.';
+      openExternalPlayback(track.youtubeUrl);
+      nowPlayingLabel.textContent = 'Opened In YouTube';
+      nowPlayingText.textContent = 'Inline playback is blocked in local file mode, so the track was opened on YouTube.';
+      setActiveTrack(track.id, true);
+    } else if (track.youtubeUrl) {
+      openExternalPlayback(track.youtubeUrl);
+      nowPlayingLabel.textContent = 'Opened In YouTube';
+      nowPlayingText.textContent = 'This YouTube link could not be embedded, so it was opened directly on YouTube.';
+      setActiveTrack(track.id, true);
     } else {
       nowPlayingLabel.textContent = 'Playback Notice';
       nowPlayingText.textContent = 'This record has no playable file yet.';
