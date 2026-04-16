@@ -321,6 +321,16 @@
     spotifyShell.style.display = 'none';
     setActiveTrack(track.id, false);
 
+    const spotifyEmbedUrl = getSpotifyEmbedUrl(track.spotifyUrl);
+    if (spotifyEmbedUrl) {
+      spotifyShell.innerHTML = '<iframe src="' + spotifyEmbedUrl + '" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+      spotifyShell.style.display = 'block';
+      nowPlayingLabel.textContent = 'Spotify Player';
+      nowPlayingText.textContent = 'Spotify player opened for ' + track.title + '.';
+      setActiveTrack(track.id, true);
+      return;
+    }
+
     if (track.audioUrl) {
       audioPlayer.src = track.audioUrl;
       audioPlayer.currentTime = 0;
@@ -331,16 +341,6 @@
       }).catch(() => {
         nowPlayingLabel.textContent = 'Ready To Play';
       });
-      return;
-    }
-
-    const spotifyEmbedUrl = getSpotifyEmbedUrl(track.spotifyUrl);
-    if (spotifyEmbedUrl) {
-      spotifyShell.innerHTML = '<iframe src="' + spotifyEmbedUrl + '" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
-      spotifyShell.style.display = 'block';
-      nowPlayingLabel.textContent = 'Spotify Player';
-      nowPlayingText.textContent = 'Spotify player opened for ' + track.title + '.';
-      setActiveTrack(track.id, true);
       return;
     }
 
