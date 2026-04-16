@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -324,6 +324,7 @@
     if (track.audioUrl) {
       audioPlayer.src = track.audioUrl;
       audioPlayer.currentTime = 0;
+      audioPlayer.load(); // Make sure the new audio source is ready.
       audioPlayer.play().then(() => {
         nowPlayingLabel.textContent = 'Now Playing';
         setActiveTrack(track.id, true);

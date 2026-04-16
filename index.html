@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -95,28 +95,67 @@
   .gallery-item { overflow: hidden; position: relative; background: var(--grey); }
   .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease, filter 0.6s ease; filter: grayscale(0.15) brightness(0.8); }
   .gallery-item:hover img { transform: scale(1.08); filter: grayscale(0) brightness(1); }
+
+  /* ── Contact ── */
   .contact { display: grid; grid-template-columns: 0.95fr 1.05fr; padding: 0; }
   .contact-info, .contact-form-area { padding: 100px 60px; }
   .contact-info { border-right: 1px solid var(--grey-mid); }
   .contact-links { margin-top: 40px; display: flex; flex-direction: column; gap: 18px; }
-  .contact-link { display: flex; align-items: center; gap: 18px; color: var(--white); text-decoration: none; font-size: 18px; }
-  .contact-link-icon { width: 46px; height: 46px; border: 1px solid rgba(245,240,235,0.12); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--red); }
+  .contact-link { display: flex; align-items: center; gap: 18px; color: var(--white); text-decoration: none; font-size: 18px; transition: color 0.3s; }
+  .contact-link:hover { color: var(--red); }
+  .contact-link-icon { width: 46px; height: 46px; border: 1px solid rgba(245,240,235,0.12); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; color: var(--red); flex-shrink: 0; }
   .form-group { margin-bottom: 24px; }
   .form-group label { display: block; font-family: 'Bebas Neue', sans-serif; letter-spacing: 3px; font-size: 13px; margin-bottom: 10px; color: rgba(245,240,235,0.55); }
-  input, textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(245,240,235,0.2); padding: 14px 0; color: var(--white); font-family: 'Crimson Text', serif; font-size: 18px; resize: vertical; }
+  input, textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(245,240,235,0.2); padding: 14px 0; color: var(--white); font-family: 'Crimson Text', serif; font-size: 18px; resize: vertical; transition: border-color 0.3s; }
   input:focus, textarea:focus { outline: none; border-bottom-color: var(--red); }
+  input::placeholder, textarea::placeholder { color: rgba(245,240,235,0.28); }
   textarea { min-height: 140px; }
-  footer { padding: 36px 60px; display: flex; justify-content: space-between; align-items: center; gap: 20px; border-top: 1px solid rgba(245,240,235,0.08); }
-  .footer-logo img { height: 44px; }
-  .footer-copy { font-size: 15px; color: rgba(245,240,235,0.45); }
-  .footer-social { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-  .footer-social a { color: rgba(245,240,235,0.6); text-decoration: none; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; }
+
+  /* Send button states */
+  #send-btn { border: none; width: 100%; transition: all 0.3s; }
+  #send-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  #send-btn.sent { background: #1a1a1a; color: rgba(245,240,235,0.5); cursor: default; }
+
+  /* ── Footer ── */
+  footer { padding: 60px 60px 40px; border-top: 1px solid rgba(245,240,235,0.08); background: #0a0a0a; }
+  .footer-top { display: grid; grid-template-columns: 1fr auto auto; gap: 60px; align-items: start; margin-bottom: 48px; }
+  .footer-logo img { height: 60px; margin-bottom: 24px; display: block; }
+  .footer-contact a { display: block; color: rgba(245,240,235,0.55); text-decoration: none; font-size: 15px; font-family: 'Crimson Text', serif; margin-bottom: 8px; transition: color 0.3s; }
+  .footer-contact a:hover { color: var(--red); }
+  .footer-col-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 4px; font-size: 12px; color: rgba(245,240,235,0.3); margin-bottom: 20px; }
+  .footer-links { display: flex; flex-direction: column; gap: 14px; }
+  .footer-links a { display: flex; align-items: center; gap: 12px; color: rgba(245,240,235,0.65); text-decoration: none; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; font-size: 14px; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--red); }
+  .footer-links a svg { flex-shrink: 0; }
+  .footer-bottom { border-top: 1px solid rgba(245,240,235,0.06); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-copy { font-size: 15px; color: rgba(245,240,235,0.35); }
+  .footer-admin { display: flex; align-items: center; gap: 8px; color: rgba(245,240,235,0.22); text-decoration: none; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; font-size: 13px; transition: color 0.3s; }
+  .footer-admin:hover { color: rgba(245,240,235,0.6); }
+
   @media (max-width: 1100px) { .music-shell { grid-template-columns: 1fr; } .player-card { position: static; } }
-  @media (max-width: 900px) { nav { padding: 18px 24px; } .nav-logo img { height: 70px; } .nav-links { display: none; } section { padding: 80px 24px; } .hero { padding: 0 24px 60px; } .about { grid-template-columns: 1fr; } .about-images { height: 350px; } .gallery-grid { grid-template-columns: 1fr 1fr; } .contact { grid-template-columns: 1fr; } .contact-info { border-right: none; border-bottom: 1px solid var(--grey-mid); padding: 80px 24px; } .contact-form-area { padding: 80px 24px; } footer { flex-direction: column; text-align: center; padding: 40px 24px; } .show-item, .track-item { grid-template-columns: 1fr; justify-items: start; } .track-actions { justify-content: flex-start; } .scroll-indicator { display: none; } }
-  @media (max-width: 640px) { .divider { margin: 0 24px; } .gallery-grid { grid-template-columns: 1fr; } .hero-cta, .player-controls, .track-actions { width: 100%; } .btn-primary, .btn-outline, .show-ticket, .music-link, .player-button, .small-button { width: 100%; } }
+  @media (max-width: 900px) {
+    nav { padding: 18px 24px; } .nav-logo img { height: 70px; } .nav-links { display: none; }
+    section { padding: 80px 24px; } .hero { padding: 0 24px 60px; }
+    .about { grid-template-columns: 1fr; } .about-images { height: 350px; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .contact { grid-template-columns: 1fr; }
+    .contact-info { border-right: none; border-bottom: 1px solid var(--grey-mid); padding: 80px 24px; }
+    .contact-form-area { padding: 80px 24px; }
+    footer { padding: 40px 24px; }
+    .footer-top { grid-template-columns: 1fr; gap: 36px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .show-item, .track-item { grid-template-columns: 1fr; justify-items: start; }
+    .track-actions { justify-content: flex-start; } .scroll-indicator { display: none; }
+  }
+  @media (max-width: 640px) {
+    .divider { margin: 0 24px; } .gallery-grid { grid-template-columns: 1fr; }
+    .hero-cta, .player-controls, .track-actions { width: 100%; }
+    .btn-primary, .btn-outline, .show-ticket, .music-link, .player-button, .small-button { width: 100%; }
+  }
 </style>
 </head>
 <body>
+
 <nav>
   <div class="nav-logo"><img src="SouthOfTheSunLogo-05.png" alt="South of the Sun"></div>
   <ul class="nav-links">
@@ -127,6 +166,7 @@
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
+
 <section class="hero" id="home">
   <div class="hero-bg"></div>
   <div class="hero-gradient"></div>
@@ -142,7 +182,9 @@
   </div>
   <div class="scroll-indicator"><div class="scroll-line"></div><span>Scroll</span></div>
 </section>
+
 <div class="divider"></div>
+
 <section class="about" id="about">
   <div class="about-images">
     <img class="about-img-main" src="IMG_7255.JPG" alt="Band photo">
@@ -158,18 +200,22 @@
     <a href="about.html" class="btn-outline" style="margin-top:16px;">Learn More</a>
   </div>
 </section>
+
 <div class="divider"></div>
+
 <section class="shows" id="shows">
   <p class="section-label">On the Road</p>
   <h2 class="section-title">Upcoming Shows</h2>
   <p class="section-copy">These dates are loaded from the admin panel. When the admin adds a concert date and ticket link, it appears here automatically.</p>
   <div class="shows-grid" id="shows-list"></div>
 </section>
+
 <div class="stage-section">
   <div class="stage-bg"></div>
   <div class="stage-overlay"></div>
   <div class="stage-content"><h2>Feel the<br><em>heat</em></h2></div>
 </div>
+
 <section class="music" id="music">
   <p class="section-label">Discography</p>
   <h2 class="section-title">Our Music</h2>
@@ -197,7 +243,9 @@
     <div class="tracks-grid" id="tracks-list"></div>
   </div>
 </section>
+
 <div class="divider"></div>
+
 <section class="gallery" id="gallery">
   <div class="gallery-header">
     <p class="section-label">Photos</p>
@@ -209,74 +257,208 @@
     <div class="gallery-item"><img src="IMG_20251025_211154691.jpg" alt="Live show"></div>
   </div>
 </section>
+
 <div class="divider"></div>
+
+<!-- ══════════════════════════════════════
+     CONTACT
+══════════════════════════════════════ -->
 <section class="contact" id="contact">
+
+  <!-- Left: info -->
   <div class="contact-info">
     <p class="section-label">Get in Touch</p>
     <h2 class="section-title">Contact</h2>
-    <p style="font-size:18px; color:rgba(245,240,235,0.65); margin-bottom:16px; line-height:1.7;">Booking, press, or collaborations - the band can be reached directly here.</p>
+    <p style="font-size:18px; color:rgba(245,240,235,0.65); margin-bottom:16px; line-height:1.7;">Booking, press, or collaborations — reach us directly.</p>
     <div class="contact-links">
-      <a href="mailto:info@southofthesun.am" class="contact-link"><div class="contact-link-icon">@</div>info@southofthesun.am</a>
-      <a href="#" class="contact-link"><div class="contact-link-icon">IG</div>@southofthesunband</a>
-      <a href="#" class="contact-link"><div class="contact-link-icon">FB</div>South of the Sun</a>
-      <a href="#" class="contact-link"><div class="contact-link-icon">YT</div>South of the Sun · YouTube</a>
+      <a href="mailto:Armanmsryan@gmail.com" class="contact-link">
+        <div class="contact-link-icon">@</div>Armanmsryan@gmail.com
+      </a>
+      <a href="tel:+37496400426" class="contact-link">
+        <div class="contact-link-icon">☎</div>+374 96 400 426
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">IG</div>@southofthesunband
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">FB</div>South of the Sun
+      </a>
+      <a href="#" class="contact-link">
+        <div class="contact-link-icon">YT</div>South of the Sun · YouTube
+      </a>
     </div>
   </div>
+
+  <!-- Right: form -->
   <div class="contact-form-area">
     <p class="section-label" style="margin-top:0;">Send a Message</p>
     <h2 class="section-title" style="font-size:clamp(28px,3vw,44px);">Let's Talk</h2>
-    <div class="form-group"><label>Your Name</label><input type="text" placeholder="Name Surname"></div>
-    <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"></div>
-    <div class="form-group"><label>Subject</label><input type="text" placeholder="Booking / Press / Other"></div>
-    <div class="form-group"><label>Message</label><textarea placeholder="Tell us what's on your mind..."></textarea></div>
-    <button class="btn-primary" style="border:none; width:100%;" type="button" onclick="this.textContent='Sent'; this.style.background='#1a1a1a';">Send Message</button>
+
+    <div class="form-group">
+      <label for="cf-name">Your Name</label>
+      <input type="text" id="cf-name" placeholder="Name Surname" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label for="cf-email">Email Address</label>
+      <input type="email" id="cf-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="cf-subject">Subject</label>
+      <input type="text" id="cf-subject" placeholder="Booking / Press / Other">
+    </div>
+    <div class="form-group">
+      <label for="cf-message">Message</label>
+      <textarea id="cf-message" placeholder="Tell us what's on your mind..."></textarea>
+    </div>
+
+    <!-- Validation error -->
+    <p id="cf-error" style="color:var(--red); font-size:15px; margin-bottom:16px; display:none;">Please fill in all fields before sending.</p>
+
+    <button class="btn-primary" id="send-btn" type="button" onclick="sendContactForm()">
+      Send Message
+    </button>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
 <footer>
-  <div class="footer-logo"><img src="SouthOfTheSunLogo-05.png" alt="South of the Sun"></div>
-  <p class="footer-copy">© 2026 South of the Sun · All rights reserved</p>
-  <div class="footer-social">
-    <a href="#">Instagram</a>
-    <a href="#">Facebook</a>
-    <a href="#" id="footer-spotify">Spotify</a>
-    <a href="#" id="footer-youtube">YouTube</a>
-    <a class="admin-link" href="admin.html">Admin Portal</a>
+  <div class="footer-top">
+
+    <!-- Logo + contact -->
+    <div>
+      <div class="footer-logo"><img src="SouthOfTheSunLogo-05.png" alt="South of the Sun"></div>
+      <div class="footer-contact">
+        <a href="mailto:Armanmsryan@gmail.com">Armanmsryan@gmail.com</a>
+        <a href="tel:+37496400426">+374 96 400 426</a>
+      </div>
+    </div>
+
+    <!-- Streaming -->
+    <div>
+      <p class="footer-col-title">Streaming</p>
+      <div class="footer-links">
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </a>
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 0C5.408-.02.024 5.36.004 11.992c-.02 6.592 5.336 11.968 11.928 11.988 6.632.02 12.008-5.316 12.028-11.948C23.98 5.388 18.648.02 12.04 0zm4.904 8.58a.63.63 0 0 1-.064.308c-.2.408-.616.644-1.052.576a9.78 9.78 0 0 0-1.528-.084c-1.148.024-2.268.284-3.26.844-1.08.604-1.88 1.468-2.316 2.66-.3.82-.34 1.66-.22 2.512.032.24-.048.448-.248.576-.184.116-.4.124-.592.024a.594.594 0 0 1-.308-.404 7.45 7.45 0 0 1 .084-3.344c.564-2.08 1.88-3.496 3.876-4.28 1.148-.452 2.348-.616 3.584-.576.388.012.772.048 1.156.1.392.056.732.256.876.624a.83.83 0 0 1 .012.464zm-1.272 3.16a.48.48 0 0 1-.456.48c-.18.012-.36.012-.54.012-.748 0-1.484.1-2.188.356-.844.308-1.508.82-1.916 1.636-.228.456-.336.944-.296 1.452.02.268-.1.476-.34.584-.236.104-.464.064-.648-.1a.57.57 0 0 1-.168-.456 4.39 4.39 0 0 1 .276-1.888c.672-1.716 1.944-2.72 3.756-3.048.544-.1 1.096-.132 1.648-.084.44.036.832.308.876.748a.64.64 0 0 1-.004.308zm-1.396 3.2c0 .508-.408.924-.92.928a.93.93 0 0 1-.932-.916.928.928 0 0 1 .924-.936c.516-.004.928.408.928.924z"/></svg>
+          Apple Music
+        </a>
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 12C0 5.373 5.373 0 12 0s12 5.373 12 12-5.373 12-12 12S0 18.627 0 12zm18.073-3.763c-.065-.053-.17-.08-.314-.08-.195 0-.38.052-.55.156-.172.104-.34.265-.5.48l-3.2 4.36-1.51-1.876c-.186-.232-.38-.396-.582-.492-.2-.097-.418-.145-.654-.145-.277 0-.513.062-.705.187-.192.125-.288.28-.288.468 0 .11.03.218.094.322l2.25 2.803c.19.232.386.396.59.492.202.097.424.145.664.145.274 0 .508-.062.7-.186.192-.124.388-.33.586-.617l3.896-5.31c.065-.092.098-.19.098-.295 0-.178-.09-.33-.275-.412z"/></svg>
+          Deezer
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Socials -->
+    <div>
+      <p class="footer-col-title">Socials</p>
+      <div class="footer-links">
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          Instagram
+        </a>
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.5 12.068c0-6.904 5.433-12.368 12.432-12.368 3.316 0 6.432 1.3 8.772 3.662 2.338 2.362 3.617 5.496 3.617 8.84 0 6.903-5.435 12.368-12.135 12.368v.43zm1.746-7.975-.002.001c.584-.23 1.298-.79 1.755-1.49.457-.699.584-1.36.362-1.86-.221-.498-.851-.75-1.867-.75h-.002c-1.215 0-2.174.482-2.84 1.432-.671.957-.86 2.108-.521 3.229.247.817.738 1.303 1.354 1.303.288 0 .597-.102.93-.307l.831-.558zm-2.804-8.293c-.658.24-1.312.74-1.79 1.374-.48.634-.72 1.348-.695 2.069.038 1.09.672 1.773 1.63 1.773.253 0 .519-.055.793-.163.648-.25 1.292-.763 1.762-1.397.47-.634.7-1.34.654-2.05-.069-1.06-.713-1.72-1.664-1.72-.226 0-.46.038-.69.114z"/></svg>
+          Threads
+        </a>
+
+        <a href="#" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 South of the Sun · All rights reserved</p>
+    <a href="admin.html" class="footer-admin">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a5 5 0 1 1 0 10A5 5 0 0 1 12 2zm0 12c5.523 0 10 2.239 10 5v1H2v-1c0-2.761 4.477-5 10-5z"/></svg>
+      Admin Portal
+    </a>
   </div>
 </footer>
+
 <script src="site-data.js"></script>
 <script>
-  let shows = [];
-  let tracks = [];
-  const showsList = document.getElementById('shows-list');
-  const tracksList = document.getElementById('tracks-list');
-  const audio = document.getElementById('site-audio');
-  const playCurrentButton = document.getElementById('play-current');
-  const playerCover = document.getElementById('player-cover');
-  const playerYear = document.getElementById('player-year');
-  const playerTitle = document.getElementById('player-title');
-  const playerDescription = document.getElementById('player-description');
-  const playerStatus = document.getElementById('player-status');
-  const spotifyLink = document.getElementById('spotify-link');
-  const youtubeLink = document.getElementById('youtube-link');
-  const footerSpotify = document.getElementById('footer-spotify');
-  const footerYoutube = document.getElementById('footer-youtube');
-  const videoShell = document.getElementById('video-shell');
-  let currentTrack = null;
+  /* ── Contact form ── */
+  function sendContactForm() {
+    var name    = document.getElementById('cf-name').value.trim();
+    var email   = document.getElementById('cf-email').value.trim();
+    var subject = document.getElementById('cf-subject').value.trim();
+    var message = document.getElementById('cf-message').value.trim();
+    var error   = document.getElementById('cf-error');
+    var btn     = document.getElementById('send-btn');
+
+    if (!name || !email || !subject || !message) {
+      error.style.display = 'block';
+      return;
+    }
+    error.style.display = 'none';
+
+    var body = 'Name: ' + name + '\nEmail: ' + email + '\n\n' + message;
+    var mailto = 'mailto:Armanmsryan@gmail.com'
+      + '?subject=' + encodeURIComponent(subject + ' — South of the Sun website')
+      + '&body=' + encodeURIComponent(body);
+
+    window.location.href = mailto;
+
+    btn.textContent = 'Message Ready — Check Your Email App';
+    btn.classList.add('sent');
+    btn.disabled = true;
+  }
+
+  /* ── Music player ── */
+  var shows = [];
+  var tracks = [];
+  var showsList   = document.getElementById('shows-list');
+  var tracksList  = document.getElementById('tracks-list');
+  var audio       = document.getElementById('site-audio');
+  var playCurrentButton = document.getElementById('play-current');
+  var playerCover = document.getElementById('player-cover');
+  var playerYear  = document.getElementById('player-year');
+  var playerTitle = document.getElementById('player-title');
+  var playerDescription = document.getElementById('player-description');
+  var playerStatus = document.getElementById('player-status');
+  var spotifyLink = document.getElementById('spotify-link');
+  var youtubeLink = document.getElementById('youtube-link');
+  var videoShell  = document.getElementById('video-shell');
+  var currentTrack = null;
+
   function renderShows() {
-    if (!shows.length) { showsList.innerHTML = '<div class="empty-state">No shows announced yet. New dates added by the admin will appear here.</div>'; return; }
-    showsList.innerHTML = shows.map((show) => {
-      const formattedDate = window.SOTS_STORAGE.formatShowDate(show.date);
-      const location = [show.venue, show.city, show.country].filter(Boolean).join(', ');
-      const ticketMarkup = show.ticketUrl ? '<a class="show-ticket" href="' + show.ticketUrl + '" target="_blank" rel="noopener">Tickets</a>' : '<span class="show-tag">Tickets soon</span>';
+    if (!shows.length) {
+      showsList.innerHTML = '<div class="empty-state">No shows announced yet. New dates added by the admin will appear here.</div>';
+      return;
+    }
+    showsList.innerHTML = shows.map(function(show) {
+      var formattedDate = window.SOTS_STORAGE.formatShowDate(show.date);
+      var location = [show.venue, show.city, show.country].filter(Boolean).join(', ');
+      var ticketMarkup = show.ticketUrl
+        ? '<a class="show-ticket" href="' + show.ticketUrl + '" target="_blank" rel="noopener">Tickets</a>'
+        : '<span class="show-tag">Tickets soon</span>';
       return '<div class="show-item"><div class="show-date">' + formattedDate.monthDay + '<span>' + formattedDate.year + '</span></div><div class="show-info"><h3>' + show.title + '</h3><p>' + location + '</p></div><span class="show-tag">' + (show.tag || 'Live') + '</span>' + ticketMarkup + '</div>';
     }).join('');
   }
+
   function getYouTubeEmbedUrl(url) {
-    if (!url) { return ''; }
+    if (!url) return '';
     try {
-      const parsed = new URL(url);
-      const host = parsed.hostname.replace('www.', '');
-      let videoId = '';
+      var parsed = new URL(url);
+      var host = parsed.hostname.replace('www.', '');
+      var videoId = '';
       if (host === 'youtu.be') {
         videoId = parsed.pathname.split('/').filter(Boolean)[0] || '';
       } else if (host.includes('youtube.com')) {
@@ -291,10 +473,9 @@
         }
       }
       return videoId ? 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0' : '';
-    } catch (error) {
-      return '';
-    }
+    } catch (e) { return ''; }
   }
+
   function updatePlayer(track) {
     currentTrack = track;
     playerCover.src = track.coverUrl || 'IMG_7255.JPG';
@@ -303,12 +484,13 @@
     playerDescription.textContent = track.description || 'No description yet.';
     spotifyLink.href = track.spotifyUrl || '#';
     youtubeLink.href = track.youtubeUrl || '#';
-    footerSpotify.href = track.spotifyUrl || '#';
-    footerYoutube.href = track.youtubeUrl || '#';
     videoShell.innerHTML = '';
     videoShell.style.display = 'none';
+
     if (track.audioUrl) {
       audio.src = track.audioUrl;
+      audio.currentTime = 0;
+      audio.load(); // Ensure new src is buffered before playback.
       audio.style.display = 'block';
       playCurrentButton.disabled = false;
       playCurrentButton.style.opacity = '1';
@@ -317,7 +499,7 @@
       audio.removeAttribute('src');
       audio.load();
       audio.style.display = 'none';
-      const embedUrl = getYouTubeEmbedUrl(track.youtubeUrl);
+      var embedUrl = getYouTubeEmbedUrl(track.youtubeUrl);
       if (embedUrl && location.protocol !== 'file:') {
         videoShell.innerHTML = '<iframe src="' + embedUrl + '" title="' + track.title + ' video player" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
         videoShell.style.display = 'block';
@@ -335,33 +517,39 @@
       }
     }
   }
+
   function renderTracks() {
-    if (!tracks.length) { tracksList.innerHTML = '<div class="empty-state">No music added yet. The admin can add tracks, previews, and streaming links from the admin panel.</div>'; return; }
-    tracksList.innerHTML = tracks.map((track) => {
-      const playLabel = track.audioUrl || track.youtubeUrl ? 'Play Here' : 'Open Links';
+    if (!tracks.length) {
+      tracksList.innerHTML = '<div class="empty-state">No music added yet. The admin can add tracks, previews, and streaming links from the admin panel.</div>';
+      return;
+    }
+    tracksList.innerHTML = tracks.map(function(track) {
+      var playLabel = (track.audioUrl || track.youtubeUrl) ? 'Play Here' : 'Open Links';
       return '<article class="track-item"><img class="track-thumb" src="' + (track.coverUrl || 'IMG_7365.JPG') + '" alt="' + track.title + '"><div class="track-meta"><p class="track-year">' + (track.year || '') + ' · ' + (track.releaseType || 'Release') + '</p><h3>' + track.title + '</h3><p>' + (track.description || '') + '</p></div><div class="track-actions"><button type="button" class="small-button" data-track-id="' + track.id + '">' + playLabel + '</button>' + (track.spotifyUrl ? '<a class="music-link" href="' + track.spotifyUrl + '" target="_blank" rel="noopener">Spotify</a>' : '') + (track.youtubeUrl ? '<a class="music-link" href="' + track.youtubeUrl + '" target="_blank" rel="noopener">YouTube</a>' : '') + '</div></article>';
     }).join('');
-    tracksList.querySelectorAll('[data-track-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const track = tracks.find((item) => item.id === button.dataset.trackId);
-        if (track) { updatePlayer(track); if (track.audioUrl) { audio.play().catch(() => {}); } }
+
+    tracksList.querySelectorAll('[data-track-id]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var track = tracks.find(function(item) { return item.id === button.dataset.trackId; });
+        if (track) { updatePlayer(track); if (track.audioUrl) { audio.play().catch(function(){}); } }
       });
     });
     updatePlayer(tracks[0]);
   }
-  playCurrentButton.addEventListener('click', () => {
-    if (!currentTrack) { return; }
-    if (currentTrack.audioUrl) { audio.play().catch(() => {}); return; }
+
+  playCurrentButton.addEventListener('click', function() {
+    if (!currentTrack) return;
+    if (currentTrack.audioUrl) { updatePlayer(currentTrack); audio.play().catch(function(){}); return; }
     updatePlayer(currentTrack);
   });
+
   async function initPage() {
     await window.SOTS_STORAGE.refreshContent();
-    shows = window.SOTS_STORAGE.getShows();
+    shows  = window.SOTS_STORAGE.getShows();
     tracks = window.SOTS_STORAGE.getTracks();
     renderShows();
     renderTracks();
   }
-
   initPage();
 </script>
 </body>
