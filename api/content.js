@@ -12,8 +12,17 @@ const DEFAULT_CONTENT = {
   ]
 };
 
+function getRequiredToken() {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) {
+    throw new Error('BLOB_READ_WRITE_TOKEN is missing in server environment.');
+  }
+  return token;
+}
+
 async function readContent() {
-  const blobs = await list({ prefix: 'content/site-content.json', limit: 1 });
+  const token = getRequiredToken();
+  const blobs = await list({ prefix: 'content/site-content.json', limit: 1, token });
   const blob = blobs.blobs?.find((item) => item.pathname === 'content/site-content.json') || blobs.blobs?.[0];
 
   if (!blob?.url) {
@@ -47,10 +56,12 @@ module.exports = async function handler(request, response) {
         tracks: Array.isArray(body?.tracks) ? body.tracks : DEFAULT_CONTENT.tracks
       };
 
+      const token = getRequiredToken();
       await put('content/site-content.json', JSON.stringify(content, null, 2), {
         access: 'public',
         allowOverwrite: true,
-        contentType: 'application/json'
+        contentType: 'application/json',
+        token
       });
 
       response.status(200).json(content);
